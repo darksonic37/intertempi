@@ -54,6 +54,11 @@ UserSchema.pre('save', function(next) {
     });
 })
 
+UserSchema.methods.comparePassword = async function(candidatePassword, cb) {
+  const match = await bcrypt.compare(candidatePassword, this.password)
+  return match
+}
+
 const SessionSchema = new mongoose.Schema(
   {
     username: {
@@ -63,11 +68,7 @@ const SessionSchema = new mongoose.Schema(
     token: {
       type: String,
       required: true,
-      unique: true,
-    }
-  },
-  {
-    timestamps: true
+    },
   }
 )
 

@@ -28,21 +28,51 @@ app.post('/users', async (req, res) => {
 
   // save user
   try {
-    // TODO: hash password
     let user = new db.UserModel({ username: username, password: password })
     await user.save()
+    return res.status(200).json({ user: user })
   } catch(err) {
     return res.status(400).send(`Error: request body is invalid (invalid JSON structure, empty username or password keys, or taken username)`)
   }
+})
 
-  // create session and return session token for immediate login
-  let token = uuidv4()
-  let session = new db.SessionModel({ username: username, token: token })
+// login the user
+app.post('/login', async (req, res) => {
+  let username = req.body.username
+  let password = req.body.password
+
+  let user = await db.UserModel.findOne({ username: username })
+  if(user) {
+    const match = await user.comparePassword(password, user.password)
+
+    if (match) {
+      // create new token
+      let token = uuidv4()
+      let session = new db.SessionModel({ username: username, token: token })
+      try {
+        await session.save()
+        return res.status(200).json({ token: token })
+      } catch(err) {
+        return res.status(400).send(`Error: token must be unique`)
+      }
+    } else {
+      return res.status(401).send('Error: invalid password')
+    }
+  } else {
+    return res.status(401).send(`Error: username does not exist`)
+  }
+})
+
+// logout destroys all tokens given any of the user's tokens
+app.post('/logout', async (req, res) => {
+  let token = req.body.token
+
   try {
-    await session.save()
-    return res.status(200).json({ token: token })
+    let session = await db.SessionModel.findOne({ token: token })
+    await db.SessionModel.deleteMany({ username: session.username })
+    return res.status(200).send()
   } catch(err) {
-    return res.status(400).send(`Error: token must be unique`)
+    return res.status(401).send(`Error: invalid token`)
   }
 })
 
