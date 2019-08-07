@@ -20,14 +20,20 @@ MONGO_PORT=27017
 MONGO_DATABASE=intertempi
 ```
 
-2. Run the Express.js server
+2. Run MongoDB
+
+```bash
+docker run -it --net=host mongo
+```
+
+3. Run the Express.js server
 
 ```bash
 cd api
 node app.js
 ```
 
-3. Run the self-explanatory `test.sh` script to test and explain the API
+4. Run the self-explanatory `test.sh` script to test and explain the API
 
 ```bash
 cd api
