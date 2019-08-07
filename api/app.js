@@ -11,8 +11,29 @@ app.use(cors())
 // mongo
 const db = require('./db')
 
+// authorization middleware
+const isAuthorized = async (req, res, next) => {
+  let authorization = req.headers.authorization
+  if (!authorization) {
+    return res.status(401).json({ error: 'Missing authorization header' })
+  }
+
+  let type = authorization.split(' ')[0]
+  let token = authorization.split(' ')[1]
+  if (type !== 'Bearer' || !token) {
+    return res.status(401).json({ error: 'Misconstructed authorization header' })
+  }
+
+  let session = await db.SessionModel.findOne({ token: token })
+  if (session) {
+    next()
+  } else {
+    return res.status(403).json({ error: 'Unauthorized' })
+  }
+}
+
 // get all users, ignoring pagination
-app.get('/users', async (req, res) => {
+app.get('/users', isAuthorized, async (req, res) => {
   try {
     let users = await db.UserModel.find(null, '-_id username').sort({_id:1})
     return res.status(200).json({ error: '', users: users })
@@ -32,7 +53,7 @@ app.post('/users', async (req, res) => {
     await user.save()
     return res.status(200).json({ user: user })
   } catch(err) {
-    return res.status(400).send(`Error: request body is invalid (invalid JSON structure, empty username or password keys, or taken username)`)
+    return res.status(400).json({ error: `Error: request body is invalid (invalid JSON structure, empty username or password keys, or taken username)` })
   }
 })
 
@@ -53,13 +74,13 @@ app.post('/login', async (req, res) => {
         await session.save()
         return res.status(200).json({ token: token })
       } catch(err) {
-        return res.status(400).send(`Error: token must be unique`)
+        return res.status(400).json({ error: `Error: token must be unique` })
       }
     } else {
-      return res.status(401).send('Error: invalid password')
+      return res.status(401).json({ error: 'Error: invalid password' })
     }
   } else {
-    return res.status(401).send(`Error: username does not exist`)
+    return res.status(401).json({ error: `Error: username does not exist` })
   }
 })
 
@@ -70,9 +91,9 @@ app.post('/logout', async (req, res) => {
   try {
     let session = await db.SessionModel.findOne({ token: token })
     await db.SessionModel.deleteMany({ username: session.username })
-    return res.status(200).send()
+    return res.status(200).json()
   } catch(err) {
-    return res.status(401).send(`Error: invalid token`)
+    return res.status(401).json({ error: `Error: invalid token` })
   }
 })
 
