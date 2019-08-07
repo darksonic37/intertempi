@@ -36,7 +36,7 @@ const isAuthorized = async (req, res, next) => {
 app.get('/users', isAuthorized, async (req, res) => {
   try {
     let users = await db.UserModel.find(null, '-_id username').sort({_id:1})
-    return res.status(200).json({ error: '', users: users })
+    return res.status(200).json({ error: null, users: users })
   } catch(err) {
     return res.status(200).json({ error: err, users: [] })
   }
@@ -51,7 +51,7 @@ app.post('/users', async (req, res) => {
   try {
     let user = new db.UserModel({ username: username, password: password })
     await user.save()
-    return res.status(200).json({ user: user })
+    return res.status(200).json({ error: null, user: user })
   } catch(err) {
     return res.status(400).json({ error: `Error: request body is invalid (invalid JSON structure, empty username or password keys, or taken username)` })
   }
@@ -72,7 +72,7 @@ app.post('/login', async (req, res) => {
       let session = new db.SessionModel({ username: username, token: token })
       try {
         await session.save()
-        return res.status(200).json({ token: token })
+        return res.status(200).json({ error: null, token: token })
       } catch(err) {
         return res.status(400).json({ error: `Error: token must be unique` })
       }
@@ -91,7 +91,7 @@ app.post('/logout', async (req, res) => {
   try {
     let session = await db.SessionModel.findOne({ token: token })
     await db.SessionModel.deleteMany({ username: session.username })
-    return res.status(200).json()
+    return res.status(200).json({ error: null })
   } catch(err) {
     return res.status(401).json({ error: `Error: invalid token` })
   }
