@@ -30,6 +30,7 @@ docker run -it --net=host mongo
 
 ```bash
 cd api
+npm install
 node app.js
 ```
 
@@ -47,4 +48,12 @@ Serve the client application on an HTTP server
 ```bash
 cd client
 python -m http.server
+```
+
+## Electron
+
+```bash
+cd electron
+npm install
+npm start
 ```
