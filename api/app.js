@@ -15,13 +15,24 @@ mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection 
 
 const schemas = require('./schemas')
 let UserModel = mongoose.model('User', schemas.UserSchema)
+
+// get all users, ignoring pagination
+app.get('/users', async (req, res) => {
+  try {
+    let users = await UserModel.find().sort({_id:1})
+    return res.json({ error: '', users: users})
+  } catch(err) {
+    return res.json({ error: err, users: [] })
+  }
 })
 
+// post a new user, returning a token for immediate login
 app.post('/users', (req, res) => {
   let token = uuidv4()
   res.json({ token: token })
 })
 
+// start the server
 app.listen(process.env.APP_PORT, () => {
-  console.log(`App listening on port http://${process.env.APP_HOST}:${process.env.APP_PORT}!`)
+  console.log(`Listening on http://${process.env.APP_HOST}:${process.env.APP_PORT}`)
 })
