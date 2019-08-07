@@ -111,6 +111,7 @@ async function main() {
       renderError(null)
     } catch(error) {
       console.log(error)
+      renderUsers([])
       renderError('Incorrect email or password')
     }
   })
@@ -125,6 +126,7 @@ async function main() {
         await logout(token)
 
         renderUsers([])
+        renderError(null)
         localStorage.clear()
       } catch(error) {
         console.log(error)
