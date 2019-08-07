@@ -8,8 +8,13 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
-app.get('/users', (req, res) => {
-  res.json({ users: [] })
+const mongoose = require('mongoose')
+mongoose.connect(`mongodb://${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${process.env.MONGO_DATABASE}`, { useNewUrlParser: true })
+mongoose.connection.once('open', () => console.log('MongoDB connection success'))
+mongoose.connection.on('error', console.error.bind(console, 'MongoDB connection error'))
+
+const schemas = require('./schemas')
+let UserModel = mongoose.model('User', schemas.UserSchema)
 })
 
 app.post('/users', (req, res) => {
