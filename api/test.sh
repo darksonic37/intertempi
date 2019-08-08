@@ -1,7 +1,13 @@
 #! /bin/bash
 set -euo pipefail
 echo '-w "\n"' >> ~/.curlrc
-source .env
+
+APP_HOST=127.0.0.1
+APP_PORT=1337
+
+MONGO_HOST=127.0.0.1
+MONGO_PORT=27017
+MONGO_DATABASE=intertempi
 
 # create a few users
 curl -s -X POST -H "Content-Type:application/json" http://$APP_HOST:$APP_PORT/users -d '{"username": "fabio", "password": "demo1234"}'
