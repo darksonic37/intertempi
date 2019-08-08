@@ -2,55 +2,28 @@
 
 Interview assignment for intertempi.
 
-## API
+## Development
 
-1. Setup credentials in a `.env` file that will automatically be read into Node's `process.env`
+1. The development lifecycle is encapsulated in the `development.sh` script which builds Docker images, initializes a Docker Swarm cluster, and deploys the `development.yml` stack of services.
 
-```bash
-cd api
-vim .env
+```
+./development.sh
 ```
 
-```bash
-APP_HOST=127.0.0.1
-APP_PORT=1337
+2. Run the self-explanatory `api/test.sh` script to seed, test and explain the API.
 
-MONGO_HOST=127.0.0.1
-MONGO_PORT=27017
-MONGO_DATABASE=intertempi
 ```
-
-2. Run MongoDB
-
-```bash
-docker run -it --net=host mongo
-```
-
-3. Run the Express.js server
-
-```bash
-cd api
-npm install
-node app.js
-```
-
-4. Run the self-explanatory `test.sh` script to test and explain the API
-
-```bash
-cd api
+cd api/
 ./test.sh
 ```
 
-## Client
+3. Interact with the client web application on `http://127.0.0.1`.
 
-Serve the client application on an HTTP server
-
-```bash
-cd client
-python -m http.server
+```
+xdg-open http://127.0.0.1
 ```
 
-## Electron
+4. Run the Electron wrapper application.
 
 ```bash
 cd electron

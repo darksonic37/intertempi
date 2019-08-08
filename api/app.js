@@ -1,10 +1,10 @@
-require('dotenv').config()
-
 const express = require('express')
 const cors = require('cors')
+const morgan = require('morgan')
 const uuidv4 = require('uuid/v4')
 const app = express()
 
+app.use(morgan('combined'))
 app.use(express.json())
 app.use(cors())
 
@@ -42,7 +42,7 @@ app.get('/users', isAuthorized, async (req, res) => {
   }
 })
 
-// post a new user, returning a token for immediate login
+// post a new user
 app.post('/users', async (req, res) => {
   let username = req.body.username
   let password = req.body.password

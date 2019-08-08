@@ -1,0 +1,61 @@
+version: '3.4'
+
+services:
+  mongo:
+    image: mongo
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - 27017:27017
+    networks:
+      - network
+
+  api:
+    image: intertempi-api
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - 1337:1337
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 1337
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      MONGO_DATABASE: intertempi
+    networks:
+      - network
+
+  client:
+    image: intertempi-client
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - 80:80
+    networks:
+      - network
+
+networks:
+  network:
+    driver: overlay
+    attachable: true
